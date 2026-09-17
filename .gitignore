@@ -1,0 +1,40 @@
+# Ambientes virtuais
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Credenciais e variáveis de ambiente
+.env
+.env.*
+!.env.exemplo
+
+# IDE
+.vscode/
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Dados locais
+dados/raw/*
+dados/amostras/*
+dados/temporarios/*
+
+# Preserva somente a estrutura das pastas
+!dados/raw/.gitkeep
+!dados/amostras/.gitkeep
+!dados/temporarios/.gitkeep
