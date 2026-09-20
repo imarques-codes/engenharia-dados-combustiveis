@@ -38,14 +38,20 @@ desconhecida ou não aplicável.
 
 ## RQ-003 — CNPJ
 
-O CNPJ será tratado como identificador textual.
+O CNPJ será tratado como identificador textual com 14 posições.
 
-Após a normalização, o valor deverá possuir 14 dígitos.
+O pipeline deverá suportar dois formatos:
 
-Valores provenientes da fonte com menos de 14 dígitos deverão ser
-investigados quanto à possível perda de zeros à esquerda.
+- CNPJ numérico legado;
+- CNPJ alfanumérico utilizado em novas inscrições.
 
-A validação futura deverá considerar também os dígitos verificadores.
+Para valores numéricos legados com menos de 14 posições, poderá ser
+avaliada a recuperação de zeros à esquerda.
+
+Valores alfanuméricos não deverão ser submetidos automaticamente ao
+mesmo preenchimento utilizado nos CNPJs numéricos.
+
+A validação deverá considerar também os dígitos verificadores.
 
 ---
 
