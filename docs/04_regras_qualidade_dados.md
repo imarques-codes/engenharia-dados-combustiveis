@@ -113,3 +113,17 @@ Nenhuma correção deverá sobrescrever o valor recebido originalmente.
 
 Os valores brutos deverão permanecer disponíveis para auditoria,
 rastreabilidade e eventual reprocessamento.
+
+## RQ-010 — Chave de negócio candidata
+
+Na amostra semanal analisada, a combinação:
+
+- CNPJ
+- PRODUTO
+- DATA DA COLETA
+
+não apresentou repetições entre os 19.516 registros.
+
+A combinação será tratada como chave de negócio candidata e deverá
+ser revalidada durante o processamento da série histórica antes de
+ser considerada definitiva.
