@@ -1,4 +1,6 @@
 pandas
 openpyxl
 ipykernel
+psycopg[binary]
+python-dotenv
 \ No newline at end of file
