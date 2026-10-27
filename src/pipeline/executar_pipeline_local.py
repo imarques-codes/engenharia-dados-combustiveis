@@ -3,6 +3,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.armazenamento.salvar_raw_local import salvar_arquivo_raw
+from src.banco.atualizar_caminho_raw import atualizar_caminho_raw
 from src.banco.registrar_arquivo import registrar_arquivo
 from src.banco.registrar_execucao import (
     concluir_execucao,
@@ -138,6 +140,34 @@ def executar_pipeline(
             caminho_arquivo
         )
 
+        # Preservo o arquivo original na RAW antes de iniciar
+        # qualquer transformação sobre os dados.
+        caminho_projeto = Path(__file__).resolve().parents[2]
+
+        diretorio_raw = (
+            caminho_projeto
+            / "dados"
+            / "raw"
+        )
+
+        caminho_raw_absoluto = salvar_arquivo_raw(
+            caminho_origem=caminho_arquivo,
+            diretorio_raw=diretorio_raw,
+            fonte="anp",
+        )
+
+        # Registro no catálogo um caminho relativo para não depender
+        # da estrutura específica deste computador.
+        caminho_raw_relativo = caminho_raw_absoluto.relative_to(
+            caminho_projeto
+        )
+
+        atualizar_caminho_raw(
+            id_arquivo=id_arquivo,
+            caminho_raw=caminho_raw_relativo,
+        )
+
+        # Verifico se este arquivo já possui uma execução concluída.
         ja_processado = arquivo_ja_processado(
             id_arquivo
         )
