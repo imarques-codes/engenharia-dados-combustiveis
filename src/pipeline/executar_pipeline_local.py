@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 import pandas as pd
@@ -21,6 +22,37 @@ from src.qualidade.validar_cnpj import (
     normalizar_cnpj,
     validar_cnpj,
 )
+
+def obter_argumentos():
+    """
+    Defino os parâmetros que posso informar pelo terminal
+    ao iniciar o pipeline.
+    """
+
+    parser = argparse.ArgumentParser(
+        description="Executa o pipeline local de dados da ANP"
+    )
+
+    parser.add_argument(
+        "--arquivo",
+        type=Path,
+        help="Caminho do arquivo da ANP que será processado.",
+    )
+
+    parser.add_argument(
+        "--tipo",
+        choices=["backfill", "incremental"],
+        default="backfill",
+        help="Define o tipo da carga. Padrão: backfill.",
+    )
+
+    parser.add_argument(
+        "--reprocessar",
+        action="store_true",
+        help="Permite reprocessar um arquivo já concluido.",
+    )
+
+    return parser.parse_args()
 
 
 def carregar_dados_anp(caminho_arquivo):
@@ -184,17 +216,25 @@ def executar_pipeline(
 
 
 if __name__ == "__main__":
+    argumentos = obter_argumentos()
+
     caminho_projeto = Path(__file__).resolve().parents[2]
 
-    caminho_arquivo = (
+    caminho_arquivo_padrao = (
         caminho_projeto
         / "dados"
         / "amostras"
         / "revendas_lpc_2026-09-06_2026-09-12.xlsx"
     )
 
+    caminho_arquivo = (
+        argumentos.arquivo
+        if argumentos.arquivo
+        else caminho_arquivo_padrao
+    )
+
     executar_pipeline(
         caminho_arquivo=caminho_arquivo,
-        tipo_execucao="BACKFILL",
-        permitir_reprocessamento=False,
+        tipo_execucao=argumentos.tipo.upper(),
+        permitir_reprocessamento=argumentos.reprocessar,
     )
