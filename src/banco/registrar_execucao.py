@@ -107,6 +107,55 @@ def registrar_falha(
 
         conexao.commit()
 
+def registrar_execucao_ignorada(
+    id_arquivo,
+    tipo_execucao="INCREMENTAL",
+):
+    """
+    Registro uma tentativa que não precisou processar o arquivo
+    porque ele já possui uma execução concluída.
+    """
+
+    id_execucao = str(uuid4())
+
+    comando = """
+        INSERT INTO controle_execucao (
+            id_execucao,
+            id_arquivo,
+            tipo_execucao,
+            status_execucao,
+            data_fim_utc,
+            registros_lidos,
+            registros_aprovados,
+            registros_quarentena
+        )
+        VALUES (
+            %s,
+            %s,
+            %s,
+            'IGNORADA_DUPLICIDADE',
+            CURRENT_TIMESTAMP,
+            0,
+            0,
+            0
+        );
+    """
+
+    with criar_conexao() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                comando,
+                (
+                    id_execucao,
+                    id_arquivo,
+                    tipo_execucao,
+                ),
+            )
+
+        conexao.commit()
+
+    return id_execucao
+
 
 if __name__ == "__main__":
     id_arquivo_teste = 1
