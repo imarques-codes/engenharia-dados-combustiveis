@@ -38,3 +38,7 @@ dados/temporarios/*
 !dados/raw/.gitkeep
 !dados/amostras/.gitkeep
 !dados/temporarios/.gitkeep
+
+# Ignoro os arquivos gerados na camada Bronze
+dados/bronze/*
+!dados/bronze/.gitkeep

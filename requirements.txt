@@ -3,4 +3,5 @@ openpyxl
 ipykernel
 psycopg[binary]
 python-dotenv
+pyarrow
 \ No newline at end of file

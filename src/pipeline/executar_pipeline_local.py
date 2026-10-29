@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.armazenamento.salvar_bronze_local import salvar_bronze_local
 from src.armazenamento.salvar_raw_local import salvar_arquivo_raw
 from src.banco.atualizar_caminho_raw import atualizar_caminho_raw
 from src.banco.registrar_arquivo import registrar_arquivo
@@ -59,18 +60,31 @@ def obter_argumentos():
 
 def carregar_dados_anp(caminho_arquivo):
     """
-    Carrego a planilha da ANP preservando os identificadores
-    como texto para evitar perda de informação.
+    Carrego a planilha da ANP definindo explicitamente
+    o schema das colunas textuais da fonte.
     """
+
+    colunas_texto = {
+        "CNPJ": "string",
+        "RAZÃO": "string",
+        "FANTASIA": "string",
+        "ENDEREÇO": "string",
+        "NÚMERO": "string",
+        "COMPLEMENTO": "string",
+        "BAIRRO": "string",
+        "CEP": "string",
+        "MUNICÍPIO": "string",
+        "ESTADO": "string",
+        "BANDEIRA": "string",
+        "PRODUTO": "string",
+        "UNIDADE DE MEDIDA": "string",
+    }
 
     return pd.read_excel(
         caminho_arquivo,
         sheet_name="POSTOS REVENDEDORES",
         header=9,
-        dtype={
-            "CNPJ": "string",
-            "CEP": "string",
-        },
+        dtype=colunas_texto,
     )
 
 
@@ -197,6 +211,23 @@ def executar_pipeline(
 
         dados = carregar_dados_anp(
             caminho_arquivo
+        )
+
+        # Persisto na Bronze os dados estruturados como foram lidos,
+        # antes de aplicar regras de qualidade e padronizações.
+        diretorio_bronze = (
+            caminho_projeto
+            / "dados"
+            / "bronze"
+        )
+
+        salvar_bronze_local(
+            dados=dados,
+            diretorio_bronze=diretorio_bronze,
+            id_execucao=id_execucao,
+            id_arquivo=id_arquivo,
+            arquivo_origem=caminho_arquivo.name,
+            fonte="anp",
         )
 
         dados = aplicar_regras_qualidade(
