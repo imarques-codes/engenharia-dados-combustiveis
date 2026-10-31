@@ -3,6 +3,9 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.armazenamento.salvar_quarentena_local import salvar_quarentena_local
+from src.armazenamento.salvar_silver_local import salvar_silver_local
+from src.transformacao.preparar_silver import preparar_silver
 from src.armazenamento.salvar_bronze_local import salvar_bronze_local
 from src.armazenamento.salvar_raw_local import salvar_arquivo_raw
 from src.banco.atualizar_caminho_raw import atualizar_caminho_raw
@@ -233,19 +236,54 @@ def executar_pipeline(
         dados = aplicar_regras_qualidade(
             dados
         )
+        # Preparo os registros aprovados seguindo o contrato
+        # definido para a camada Silver.
+        dados_silver = preparar_silver(
+            dados=dados,
+            id_execucao=id_execucao,
+            id_arquivo=id_arquivo,
+            arquivo_origem=caminho_arquivo.name,
+        )
 
-        dados_aprovados = dados[
-            dados["status_qualidade"] == "APROVADO"
-        ].copy()
-
+        # Preparo separadamente os registros que falharam
+        # nas regras de qualidade.
         dados_quarentena = preparar_quarentena(
             dados=dados,
             id_execucao=id_execucao,
             arquivo_origem=caminho_arquivo.name,
         )
 
+        diretorio_silver = (
+            caminho_projeto
+            / "dados"
+            / "silver"
+        )
+
+        diretorio_quarentena = (
+            caminho_projeto
+            / "dados"
+            / "quarentena"
+        )
+
+        # Persisto somente os registros aprovados na Silver.
+        salvar_silver_local(
+            dados=dados_silver,
+            diretorio_silver=diretorio_silver,
+            id_execucao=id_execucao,
+            fonte="anp",
+        )
+
+        # Persisto os registros rejeitados separadamente,
+        # preservando os motivos de quarentena para auditoria.
+        salvar_quarentena_local(
+            dados=dados_quarentena,
+            diretorio_quarentena=diretorio_quarentena,
+            id_execucao=id_execucao,
+            fonte="anp",
+        )
+
         registros_lidos = len(dados)
-        registros_aprovados = len(dados_aprovados)
+        registros_aprovados = len(dados_silver)
         registros_quarentena = len(dados_quarentena)
 
         concluir_execucao(

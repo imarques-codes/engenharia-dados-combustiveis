@@ -42,3 +42,11 @@ dados/temporarios/*
 # Ignoro os arquivos gerados na camada Bronze
 dados/bronze/*
 !dados/bronze/.gitkeep
+
+# Ignoro os dados gerados na camada Silver
+dados/silver/*
+!dados/silver/.gitkeep
+
+# Ignoro os registros gerados na quarentena
+dados/quarentena/*
+!dados/quarentena/.gitkeep
