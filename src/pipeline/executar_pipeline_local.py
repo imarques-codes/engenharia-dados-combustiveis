@@ -3,6 +3,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.armazenamento.salvar_gold_local import salvar_gold_local
+from src.transformacao.preparar_gold import preparar_gold_resumo_precos
 from src.armazenamento.salvar_quarentena_local import salvar_quarentena_local
 from src.armazenamento.salvar_silver_local import salvar_silver_local
 from src.transformacao.preparar_silver import preparar_silver
@@ -270,6 +272,23 @@ def executar_pipeline(
             dados=dados_silver,
             diretorio_silver=diretorio_silver,
             id_execucao=id_execucao,
+            fonte="anp",
+        )
+
+        #Crio uma visão analítica semanal a partir da Silver
+        dados_gold = preparar_gold_resumo_precos(
+            dados_silver
+        )
+        diretorio_gold = (
+            caminho_projeto
+            /"dados"
+            /"gold"
+        )
+        salvar_gold_local(
+            dados=dados_gold,
+            diretorio_gold=diretorio_gold,
+            id_execucao=id_execucao,
+            nome_dataset="resumo_precos_semanais",
             fonte="anp",
         )
 

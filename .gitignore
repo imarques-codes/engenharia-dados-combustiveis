@@ -50,3 +50,7 @@ dados/silver/*
 # Ignoro os registros gerados na quarentena
 dados/quarentena/*
 !dados/quarentena/.gitkeep
+
+# Ignoro os dados gerados na camada Gold
+dados/gold/*
+!dados/gold/.gitkeep
