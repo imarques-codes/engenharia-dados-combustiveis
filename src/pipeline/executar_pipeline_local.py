@@ -3,6 +3,10 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.armazenamento.salvar_modelo_dimensional_local import (
+    salvar_modelo_dimensional_local,
+)
+from src.modelagem.criar_modelo_dimensional import criar_modelo_dimensional
 from src.armazenamento.salvar_gold_local import salvar_gold_local
 from src.transformacao.preparar_gold import preparar_gold_resumo_precos
 from src.armazenamento.salvar_quarentena_local import salvar_quarentena_local
@@ -267,7 +271,7 @@ def executar_pipeline(
             / "quarentena"
         )
 
-        # Persisto somente os registros aprovados na Silver.
+                # Persisto somente os registros aprovados na Silver.
         salvar_silver_local(
             dados=dados_silver,
             diretorio_silver=diretorio_silver,
@@ -275,21 +279,43 @@ def executar_pipeline(
             fonte="anp",
         )
 
-        #Crio uma visão analítica semanal a partir da Silver
+        # Crio uma visão analítica semanal a partir da Silver.
         dados_gold = preparar_gold_resumo_precos(
             dados_silver
         )
+
         diretorio_gold = (
             caminho_projeto
-            /"dados"
-            /"gold"
+            / "dados"
+            / "gold"
         )
+
+        # Persisto o resumo analítico da camada Gold.
         salvar_gold_local(
             dados=dados_gold,
             diretorio_gold=diretorio_gold,
             id_execucao=id_execucao,
             nome_dataset="resumo_precos_semanais",
             fonte="anp",
+        )
+
+        # Crio o modelo dimensional a partir da Gold
+        # para preparar o consumo analítico no Power BI.
+        modelo_dimensional = criar_modelo_dimensional(
+            dados_gold
+        )
+
+        diretorio_modelo_dimensional = (
+            caminho_projeto
+            / "dados"
+            / "gold"
+            / "modelo_dimensional"
+        )
+
+        salvar_modelo_dimensional_local(
+            modelo=modelo_dimensional,
+            diretorio_modelo=diretorio_modelo_dimensional,
+            id_execucao=id_execucao,
         )
 
         # Persisto os registros rejeitados separadamente,
